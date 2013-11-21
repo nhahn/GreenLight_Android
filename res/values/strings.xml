@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">GreenLight</string>
+    <string name="title_room_detail">Room Detail</string>
+    <string name="username_hint">Username</string>
+    <string name="password_hint">Password</string>
+    <string name="sign_in_button">Sign In</string>
+    <string name="network_error">Error Connecting to Server</string>
+    <string name="retry">Retry</string>
+
+</resources>

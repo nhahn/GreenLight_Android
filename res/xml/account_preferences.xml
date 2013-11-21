@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="General Settings" />
+ 
+    <PreferenceScreen
+        android:key="account_settings"
+        android:title="Account Settings"
+        android:summary="Password Change, Notifications">
+        <intent
+            android:action="edu.cmu.nhahn.greenlight.authentication.Preferences.ACCOUNT_SETUP"
+            android:targetPackage="edu.cmu.nhahn.greenlight"
+            android:targetClass="edu.cmu.nhahn.greenlight.authentication.Preferences" />
+    </PreferenceScreen>
+</PreferenceScreen>

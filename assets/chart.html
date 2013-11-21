@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript">
+
+      // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+
+      // Set a callback to run when the Google Visualization API is loaded.
+      google.setOnLoadCallback(drawChart);
+
+      function dp(dateStr) {
+        var pattern = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})-\d{2}:\d{2}$/;
+        var match = pattern.exec(dateStr);
+        if (!match) {throw new Error('::Error, #dp could not parse dateStr '+dateStr);}
+        // we're safe to use the fields
+        return new Date(match[1], match[2]-1, match[3], match[4], match[5], match[6]);
+       }
+         // Callback that creates and populates a data table,
+      // instantiates the pie chart, passes in the data and
+      // draws it.
+      function drawChart() {
+
+        var table = new google.visualization.DataTable({
+            cols: [{id: 'time', label: 'Time', type: 'datetime'},
+                  {id: 'value', label: 'Value', type: 'number'}]
+                
+          });
+          
+        $.ajax({
+            url: "URLTOSEND", 
+            type: 'post',
+            datatype: 'json',
+            contentType: "application/json",
+            processData: false,
+            data: 'DATATOREPLACE',
+            success: function (data) {
+              for (var i=0; i<data.length;i++)
+              {
+                table.addRow([dp(data[i].recorded_at), data[i].value]);
+              }
+              var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+              chart.draw(table, {
+                title : 'Sensor Reading',
+                isStacked: true,
+                backgroundColor: '#F0F0F0',
+                vAxis: {title: "Reading"},
+                hAxis: {title: "Date"}
+              });
+            }
+          });
+      }
+      
+   </script>
+  </head>
+
+  <body style="background-color: #F0F0F0;">
+    <!--Div that will hold the pie chart-->
+    <div id="chart_div" style="width:100%; height:100%;"></div>
+  </body>
+</html>

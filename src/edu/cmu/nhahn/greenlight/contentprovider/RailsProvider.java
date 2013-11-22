@@ -15,6 +15,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
@@ -51,18 +52,18 @@ public class RailsProvider extends ContentProvider {
 				setup = 1;
 			}
 			database = new RailsCacheHelper(getContext(),root);
-			JSONArray arr = RailsCacheHelper.uris(root);
-			SQLiteDatabase db = database.getWritableDatabase();
-			//TODO so apparently it recreate the provider like every time... so ya
-			for(int i = 0; i < arr.length(); i++)
+			SQLiteDatabase db = database.getReadableDatabase();
+			SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+			queryBuilder.setTables(RailsCacheTable.TABLE_URI);
+			Cursor cur = queryBuilder.query(db, null, null, null, null, null, null);
+			while(cur.moveToNext())
 			{
-				ContentValues values = new ContentValues();
-				values.put(RailsCacheTable.COLUMN_MODEL, arr.getString(i));
-				db.insert(RailsCacheTable.TABLE_URI, null, values);
-				sUriMatcher.addURI(AUTHORITY, arr.getString(i),INDEX);
-				sUriMatcher.addURI(AUTHORITY, arr.getString(i)+ "/cache/*",CACHE);
-				sUriMatcher.addURI(AUTHORITY, arr.getString(i)+"/#",SHOW);
+				String model = cur.getString(cur.getColumnIndex(RailsCacheTable.COLUMN_MODEL));
+				sUriMatcher.addURI(AUTHORITY, model,INDEX);
+				sUriMatcher.addURI(AUTHORITY, model+ "/cache/*",CACHE);
+				sUriMatcher.addURI(AUTHORITY, model+"/#",SHOW);
 			}
+				
 			synchronized(setup) {
 				setup.notifyAll();
 				setup = 2;
@@ -130,11 +131,10 @@ public class RailsProvider extends ContentProvider {
 			selection = "";
 		
 		int uriType = sUriMatcher.match(uri);
-		SQLiteDatabase db = database.getWritableDatabase();
 		String model = uri.getPathSegments().get(0);
 		String query = "";
 		
-		boolean modelCached = database.checkCache(db, model, root);
+		boolean modelCached = database.checkCache(model, root);
 		
 		//Compose our 
 		switch(uriType) {

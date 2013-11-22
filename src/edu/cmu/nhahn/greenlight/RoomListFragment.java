@@ -237,8 +237,8 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 				public Cursor runQuery(CharSequence cs) {
 					RailsCursor cursor = ((RailsCursor) ((CursorWrapper) c).getWrappedCursor());
 					Uri mDataUrl = Uri.parse("content://"+RailsProvider.AUTHORITY+"/Room/cache/"+cursor.getUID());
-					String[] item = {cs.toString()};
-					return getActivity().getContentResolver().query(mDataUrl, null, "room_name LIKE %?%", item, null);
+					String[] item = {"%" + cs.toString() + "%"};
+					return getActivity().getContentResolver().query(mDataUrl, null, "room_name LIKE ?", item, null);
 				}
 				
 			});

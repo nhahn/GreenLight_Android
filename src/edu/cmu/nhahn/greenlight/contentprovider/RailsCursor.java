@@ -163,7 +163,7 @@ public class RailsCursor extends AbstractCursor {
 				else
 					RailsUtils.cvAdapt(fieldMap.get(key), obj, key, values);
 			}
-			db.update(model, values, "", new String [0]);
+			db.insertWithOnConflict(model, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 		}
 		if (!TextUtils.isEmpty(uid))
 			database.storeCacheEntry(uid, new RailsCacheEntry(model, uid, loadedAssociations, ids));

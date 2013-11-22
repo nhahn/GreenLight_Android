@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import edu.cmu.nhahn.greenlight.authentication.LoginFilter;
+
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +30,7 @@ public class RailsCacheHelper extends SQLiteOpenHelper {
 	
 	public RailsCacheHelper(Context context,final String root) throws JSONException, IOException, ClientProtocolException {
 		super(context, DATABASE_NAME, null, version(root).getInt("version"));
-		queryCache = new HashMap<String,RailsCacheEntry>();
+		queryCache = ((LoginFilter) context).getCache();
 
 	}
 	
@@ -208,8 +210,9 @@ public class RailsCacheHelper extends SQLiteOpenHelper {
 		
 	}
 	
-	protected synchronized boolean checkCache(SQLiteDatabase db, String model,String root) {
+	protected synchronized boolean checkCache(String model,String root) {
 		boolean modelCached = true;
+		SQLiteDatabase db = this.getWritableDatabase();
 		//Check the status of the cache database
 		if (!RailsCacheHelper.schemaCheck(db,model))
 		{	
@@ -228,6 +231,7 @@ public class RailsCacheHelper extends SQLiteOpenHelper {
 			modelCached = false;
 			this.clearModelFromCache(model);
 		}
+		db.close();
 		return modelCached;
 	}
 	

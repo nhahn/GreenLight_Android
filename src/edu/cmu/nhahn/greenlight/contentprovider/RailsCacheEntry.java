@@ -40,13 +40,13 @@ public class RailsCacheEntry {
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		SQLiteDatabase database = db.getWritableDatabase();
 		queryBuilder.setTables(this.model);
-		String inClause = "[";
+		String inClause = "(";
 		
 		for (int i : ids)
 			if(i > 0)
 				inClause += i + ",";
 		
-		inClause = inClause.substring(0, inClause.length()-1) + "]";
+		inClause = inClause.substring(0, inClause.length()-1) + ")";
 		
 		Cursor cur = queryBuilder.query(database, null, "id in " + inClause, null, null, null, null);
 		return new RailsCursor(this.model,db,cur,this.loadedAssociations);
@@ -57,15 +57,15 @@ public class RailsCacheEntry {
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		SQLiteDatabase database = db.getWritableDatabase();
 		queryBuilder.setTables(this.model);
-		String inClause = "[";
+		String inClause = "(";
 		
 		for (int i : ids)
 			if(i > 0)
 				inClause += i + ",";
 		
-		inClause = inClause.substring(0, inClause.length()-1) + "]";
+		inClause = inClause.substring(0, inClause.length()-1) + ")";
 		if(!TextUtils.isEmpty(selection))
-			inClause += "AND" + selection;
+			inClause += " AND " + selection;
 		Cursor cur = queryBuilder.query(database, null, "id in " + inClause, selectionArgs, null, null, null);
 		return new RailsCursor(this.model,db,cur,this.loadedAssociations);
 	}

@@ -1,9 +1,11 @@
 package edu.cmu.nhahn.greenlight.contentprovider;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,6 +72,26 @@ public class RailsCacheTable {
 		database.execSQL(DATABASE_CREATE_URI);
 		database.execSQL(DATABASE_CREATE_ASSOCIATIONS);
 
+		JSONArray arr;
+		try {
+			arr = RailsCacheHelper.uris(RailsProvider.root);
+			for(int i = 0; i < arr.length(); i++)
+			{
+				ContentValues values = new ContentValues();
+				values.put(RailsCacheTable.COLUMN_MODEL, arr.getString(i));
+				database.insert(RailsCacheTable.TABLE_URI, null, values);
+			}
+		} catch (ClientProtocolException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public static void onUpgrade(SQLiteDatabase database, int oldVersion,

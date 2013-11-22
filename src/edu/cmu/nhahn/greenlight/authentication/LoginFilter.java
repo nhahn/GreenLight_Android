@@ -1,5 +1,8 @@
 package edu.cmu.nhahn.greenlight.authentication;
 
+import java.util.HashMap;
+
+import edu.cmu.nhahn.greenlight.contentprovider.RailsCacheEntry;
 import android.app.Application;
 import android.content.Intent;
 import android.text.TextUtils;
@@ -8,6 +11,7 @@ public class LoginFilter extends Application {
 
 	private String token;
 	private String account;
+	private HashMap<String, RailsCacheEntry> cache = new HashMap<String,RailsCacheEntry>();
 
 	public LoginFilter() {
 	}
@@ -25,6 +29,10 @@ public class LoginFilter extends Application {
 	
 	public String getAccount(){
 		return account;
+	}
+	
+	public HashMap<String,RailsCacheEntry> getCache() {
+		return cache;
 	}
 	
 	protected void setToken(String token) {

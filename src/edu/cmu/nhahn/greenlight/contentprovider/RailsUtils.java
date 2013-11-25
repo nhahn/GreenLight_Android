@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,13 +30,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 public class RailsUtils {
 
 	public static void jsonAdapt(String type, JSONObject params,
 			String key, ContentValues values) {
 		try{
-			if(type.equals("boolean"))
+			if(type == null)
+				return;
+			else if(type.equals("boolean"))
 				params.put(key,values.getAsBoolean(key));
 			else if (type.equals("date"))
 				params.put(key,values.getAsInteger(key));
@@ -68,6 +72,8 @@ public class RailsUtils {
 	public static void cvAdapt(String type, JSONObject obj,
 			String key, ContentValues values) {
 		try{
+			if (type == null)
+				return;
 			if(type.equals("boolean"))
 				values.put(key, obj.getBoolean(key));
 			else if (type.equals("date"))
@@ -147,7 +153,7 @@ public class RailsUtils {
         return convertStreamToString(response.getEntity().getContent());
 	}
 	
-	public static String postRequest(String root, String path, String json) throws ClientProtocolException, IOException
+	public static JSONArray postRequest(String root, String path, String json) throws ClientProtocolException, IOException
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
 		Uri.Builder uri = Uri.parse("http://"+root).buildUpon().path(path);
@@ -159,7 +165,21 @@ public class RailsUtils {
         post.setHeader("Content-Type", "application/json");
         post.setEntity(new StringEntity(json));
         response = client.execute(post);
-        return convertStreamToString(response.getEntity().getContent());
+        String out = convertStreamToString(response.getEntity().getContent());
+        try{
+        	return new JSONArray(out);
+        } catch (JSONException e)
+        {
+        	try{
+        		JSONArray ret = new JSONArray();
+        		ret.put(new JSONObject(out));
+        		return ret;
+        	} catch (Exception e1)
+        	{
+        		Log.e("JSONProblem", e1.getMessage(), e1);
+        		return new JSONArray();
+        	}
+        }
 	}
 	
 	public static String convertStreamToString(InputStream inputStream) throws IOException {

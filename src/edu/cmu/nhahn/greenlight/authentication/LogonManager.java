@@ -119,7 +119,7 @@ public class LogonManager extends AccountAuthenticatorActivity {
     	info.put("password", password);
     	info.put("email", username);
     	user.put("user", info);
-    	JSONObject retVal = new JSONObject(RailsUtils.postRequest(RailsProvider.root, "/api/v1/sessions", user.toString()));
+    	JSONObject retVal = RailsUtils.postRequest(RailsProvider.root, "/api/v1/sessions", user.toString()).optJSONObject(0);
     	if (retVal.has("success"))
     		bundle.putString(AccountManager.KEY_AUTHTOKEN, retVal.getJSONObject("data").getString("auth_token"));
 

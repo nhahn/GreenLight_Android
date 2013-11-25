@@ -2,7 +2,11 @@ package edu.cmu.nhahn.greenlight;
 
 import edu.cmu.nhahn.greenlight.R;
 import edu.cmu.nhahn.greenlight.bluetooth.MonitoringService;
+import edu.cmu.nhahn.greenlight.contentprovider.RailsProvider;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 
@@ -52,12 +56,42 @@ public class RoomListActivity extends Activity implements
 		
 		if(getIntent().getStringExtra(RoomDetailFragment.ARG_ROOM_ID) != null)
 		{
-			onItemSelected(getIntent().getStringExtra(RoomDetailFragment.ARG_ROOM_ID));
+			lookupItem(getIntent().getStringExtra(RoomDetailFragment.ARG_ROOM_ID));
 		}
 
 		// TODO: If exposing deep links into your app, handle intents here.
 	}
 
+	public void lookupItem(String id) {
+		new LookupIdTask().execute(id);
+	}
+	
+	
+	 private class LookupIdTask extends AsyncTask<String, Void, Cursor> {
+	     protected Cursor doInBackground(String... id) {
+	 		Uri mDataUrl = Uri.parse("content://"+RailsProvider.AUTHORITY+"/Dimmer");
+	 		String[] selectionArgs = new String[1];
+	 		selectionArgs[0] = "integer:"+id[0];
+	 		
+	        return  getContentResolver().query(
+	        		mDataUrl,
+	        		null,
+	        		"find_by_id(?).current_room_dimmer.room", 
+	        		selectionArgs, null);
+	     }
+
+	     protected void onProgressUpdate(Void... progress) {
+	     }
+
+	     protected void onPostExecute(Cursor c) {
+	    	 if (c == null)
+	    		 return;
+	    	 
+	    	 c.moveToFirst();
+	    	 onItemSelected(c.getString(c.getColumnIndex("id")));
+	     }
+	 }
+	
 	/**
 	 * Callback method from {@link RoomListFragment.Callbacks} indicating that
 	 * the item with the given ID was selected.

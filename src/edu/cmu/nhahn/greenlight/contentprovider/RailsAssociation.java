@@ -89,7 +89,7 @@ public class RailsAssociation {
 			String model = getKlass();
 			String query = RailsCacheHelper.composeQuery(model,"where(?)",args).toString();
 			String uid = RailsCacheHelper.generateCacheUID(model, "where(?)", args);
-			return new RailsCursor(model,database,new JSONArray(RailsUtils.postRequest(RailsProvider.root,"api/v1/query.json",query)),new String[0], uid);
+			return new RailsCursor(model,database,RailsUtils.postRequest(RailsProvider.root,"api/v1/query.json",query),new String[0], uid);
 		}
 		
 	}

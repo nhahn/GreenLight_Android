@@ -46,12 +46,8 @@ public class RailsProvider extends ContentProvider {
 				return false;
 			
 			synchronized(setup) {
-			if (setup == 1)
-				return true;
-			else
-				setup = 1;
+				database = new RailsCacheHelper(getContext(),root);
 			}
-			database = new RailsCacheHelper(getContext(),root);
 			SQLiteDatabase db = database.getReadableDatabase();
 			SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 			queryBuilder.setTables(RailsCacheTable.TABLE_URI);
@@ -110,18 +106,6 @@ public class RailsProvider extends ContentProvider {
 		// TODO figure out value portion for this 
 		if(!setupDB())
 			return null;
-		
-		synchronized (setup)
-		{
-			while (setup < 2)
-			{
-				try {
-					setup.wait();
-				} catch (InterruptedException e) {
-					return null;
-				}
-			}
-		}
 		
 		if (selectionArgs == null)
 			selectionArgs = new String[0];
@@ -183,11 +167,9 @@ public class RailsProvider extends ContentProvider {
 		String uid = RailsCacheHelper.generateCacheUID(model, selection, selectionArgs);
 		
 		try {			
-			return new RailsCursor(model,database,new JSONArray(RailsUtils.postRequest(root,"api/v1/query.json",query)),includes, uid);
+			return new RailsCursor(model,database,RailsUtils.postRequest(root,"api/v1/query.json",query),includes, uid);
 		} catch (ClientProtocolException e) {
 			Log.e("RailsProviderQuery", "Client HTTP Error", e);
-		} catch (JSONException e) {
-			Log.e("RailsProviderQuery", "Error parsing return (incorrect JSON)", e);
 		} catch (IOException e) {
 			Log.e("RailsProviderQuery", "Network IO Error", e);
 		}
@@ -237,7 +219,7 @@ public class RailsProvider extends ContentProvider {
 			}
 			
 			try {
-				response = new JSONObject(RailsUtils.postRequest(root,"/api/v1/insert.json", obj.toString()));
+				response = RailsUtils.postRequest(root,"/api/v1/insert.json", obj.toString()).optJSONObject(0);
 			} catch (ClientProtocolException e) {
 				// TODO Auto-generated catch block
 				throw new IllegalArgumentException(e);

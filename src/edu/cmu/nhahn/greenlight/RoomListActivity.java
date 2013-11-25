@@ -106,6 +106,7 @@ public class RoomListActivity extends Activity implements
 			arguments.putString(RoomDetailFragment.ARG_ROOM_ID, id);
 			RoomDetailFragment fragment = new RoomDetailFragment();
 			fragment.setArguments(arguments);
+			fragment.setHasOptionsMenu(true);
 			getFragmentManager().beginTransaction()
 					.replace(R.id.room_detail_container, fragment).commit();
 

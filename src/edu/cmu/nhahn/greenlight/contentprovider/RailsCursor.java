@@ -31,14 +31,23 @@ public class RailsCursor extends AbstractCursor {
 	private RailsCacheHelper database;
 	private String uid;
 	
-	public RailsCursor(final String model, final RailsCacheHelper database, final JSONArray json, final String[] loadedAssociations, final String uid) {
+	public RailsCursor(final RailsCacheHelper database, final JSONObject jsonout, final String[] loadedAssociations, final String uid) {
 		super();
-		this.json = json;
+		try {
+			this.json = new JSONArray(jsonout.optString("response"));
+		} catch (JSONException e1) {
+			this.json = new JSONArray();
+			this.json.put(jsonout.optJSONObject("response"));
+		}
+
 		cache = false;
 		this.db = database.getWritableDatabase();
 		this.database = database;
-		fieldMap = RailsUtils.buildFields(model,db);
-		associations = RailsUtils.buildAssociations(model,db);
+		
+		addModel(jsonout);
+		
+		fieldMap = RailsUtils.buildFields(jsonout.optString("model"),db);
+		associations = RailsUtils.buildAssociations(jsonout.optString("model"),db);
 		this.uid = uid;
 		for(String aso : loadedAssociations) {
 			if (!RailsCacheHelper.schemaCheck(db,associations.get(aso).getKlass()))
@@ -56,13 +65,28 @@ public class RailsCursor extends AbstractCursor {
 			associations.get(aso).setLoaded(true);
 		}
 		save = new Thread(new Runnable() {
-			@Override
+			@Override 
 			public void run() {
-				saveToDatabase(database,model,json, fieldMap,loadedAssociations, uid);				
+				saveToDatabase(database,jsonout.optString("model"),json, fieldMap,loadedAssociations, uid);				
 			}
 
 		});
 		save.start();
+	}
+
+	private void addModel(final JSONObject jsonout) {
+		if (!RailsCacheHelper.schemaCheck(db,jsonout.optString("model")))
+		{	
+			Map<String,String> map = new HashMap<String,String>();
+			map.put("model",jsonout.optString("model"));
+			try {
+				RailsCacheTable.importSchema(db, RailsUtils.getRequest(RailsProvider.root, "api/v1/schema.json", map), jsonout.optString("model"));
+			} catch (ClientProtocolException e) {
+				Log.e("RailsProviderQuery", "Client HTTP Error", e);
+			} catch (IOException e) {
+				Log.e("RailsProviderQuery", "Network IO Error", e);
+			}
+		}
 	}
 	
 	public RailsCursor(final String model, final RailsCacheHelper database, final JSONArray json, final String[] loadedAssociations) {
@@ -108,6 +132,7 @@ public class RailsCursor extends AbstractCursor {
 		super();
 		this.cacheCursor = cacheCursor;
 		cache = true;
+		this.json = null;
 		this.db = database.getWritableDatabase();
 		this.database = database;
 		fieldMap = RailsUtils.buildFields(model,db);

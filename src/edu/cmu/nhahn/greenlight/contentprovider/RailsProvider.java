@@ -167,7 +167,7 @@ public class RailsProvider extends ContentProvider {
 		String uid = RailsCacheHelper.generateCacheUID(model, selection, selectionArgs);
 		
 		try {			
-			return new RailsCursor(model,database,RailsUtils.postRequest(root,"api/v1/query.json",query),includes, uid);
+			return new RailsCursor(database,RailsUtils.postRequest(root,"api/v1/query.json",query),includes, uid);
 		} catch (ClientProtocolException e) {
 			Log.e("RailsProviderQuery", "Client HTTP Error", e);
 		} catch (IOException e) {
@@ -219,7 +219,7 @@ public class RailsProvider extends ContentProvider {
 			}
 			
 			try {
-				response = RailsUtils.postRequest(root,"/api/v1/insert.json", obj.toString()).optJSONObject(0);
+				response = RailsUtils.postRequest(root,"/api/v1/insert.json", obj.toString());
 			} catch (ClientProtocolException e) {
 				// TODO Auto-generated catch block
 				throw new IllegalArgumentException(e);
@@ -242,8 +242,47 @@ public class RailsProvider extends ContentProvider {
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
 			String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return 0;
+		int uriType = sUriMatcher.match(uri);
+		JSONObject obj = new JSONObject();
+		String model = uri.getPathSegments().get(0);
+		JSONObject response = new JSONObject();
+
+		try {
+			switch(uriType) {
+			case SHOW:
+				JSONObject params = new JSONObject();
+				obj.put("model", model);
+				Map<String,String> fieldMap = RailsUtils.buildFields(model, database.getReadableDatabase());
+				for(String key : values.keySet())
+				{
+					if (key.equals("id"))
+						obj.put("id", values.get(key));
+					else
+						RailsUtils.jsonAdapt(fieldMap.get(key), params, key, values);
+				}
+				obj.put(model, params);
+				break;
+			}
+			
+			try {
+				response = RailsUtils.postRequest(root,"/api/v1/update.json", obj.toString());
+			} catch (ClientProtocolException e) {
+				// TODO Auto-generated catch block
+				throw new IllegalArgumentException(e);
+			} catch (IOException e) {
+				// TODO Error contacting server -- can't be saved
+				throw new IllegalStateException(e);
+			}
+			//TODO handle this better
+			if(RailsException.validateError(response))
+				throw new IllegalArgumentException(new RailsException(response));
+		
+			return response.getBoolean("validate")? 1:0;
+		} catch (JSONException e)
+		{
+			//TODO error parsing JSON
+			throw new IllegalStateException();
+		}
 	}
 	
 

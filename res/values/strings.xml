@@ -17,4 +17,8 @@
     <string name="pref_update_setting">General Settings</string>
     <string name="pref_locator_summary">Uses bluetooth to locate nearby switches for control</string>
     <string name="pref_locator">Locate nearby switches?</string>
+    
+        <string name="update">Update</string>
+        <string name="cancel">Cancel</string>
+        
 </resources>

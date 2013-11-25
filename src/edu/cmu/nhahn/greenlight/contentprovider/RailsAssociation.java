@@ -3,7 +3,6 @@ package edu.cmu.nhahn.greenlight.contentprovider;
 import java.io.IOException;
 
 import org.apache.http.client.ClientProtocolException;
-import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.database.Cursor;
@@ -89,7 +88,7 @@ public class RailsAssociation {
 			String model = getKlass();
 			String query = RailsCacheHelper.composeQuery(model,"where(?)",args).toString();
 			String uid = RailsCacheHelper.generateCacheUID(model, "where(?)", args);
-			return new RailsCursor(model,database,RailsUtils.postRequest(RailsProvider.root,"api/v1/query.json",query),new String[0], uid);
+			return new RailsCursor(database,RailsUtils.postRequest(RailsProvider.root,"api/v1/query.json",query),new String[0], uid);
 		}
 		
 	}

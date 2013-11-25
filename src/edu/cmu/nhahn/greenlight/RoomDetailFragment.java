@@ -5,10 +5,13 @@ import java.io.InputStream;
 import org.json.JSONException; 
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -17,6 +20,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
@@ -46,6 +52,8 @@ public class RoomDetailFragment extends Fragment implements LoaderManager.Loader
 	 * fragment (e.g. upon screen orientation changes).
 	 */
 	private static final int URL_LOADER = 1;
+	
+	private static final int DIALOG_CODE = 100;
 
 	
 	public RoomDetailFragment() {
@@ -61,6 +69,24 @@ public class RoomDetailFragment extends Fragment implements LoaderManager.Loader
 			// to load content from a content provider.
 			getLoaderManager().initLoader(URL_LOADER, getArguments(), (LoaderCallbacks<Cursor>) this);
 		}
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	    inflater.inflate(R.menu.detail_menu, menu);
+	    super.onCreateOptionsMenu(menu,inflater);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle presses on the action bar items
+	    switch (item.getItemId()) {
+	        case R.id.action_settings:
+	        	showSettingsDialog();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
 	}
 
 	@SuppressLint("SetJavaScriptEnabled")
@@ -134,7 +160,7 @@ public class RoomDetailFragment extends Fragment implements LoaderManager.Loader
 		if (((Cursor) cursor).moveToFirst())
 		{
 			TextView v = (TextView) getView().findViewById(R.id.room_name);
-			v.setText(cursor.getString(cursor.getColumnIndex("room_name")));
+			v.setText(cursor.getString(cursor.getColumnIndex("official_name")));
 			
 			v = (TextView) getView().findViewById(R.id.room_department);
 			Cursor tmpCursor = (Cursor) cursor.getAssociation("departments");
@@ -161,4 +187,32 @@ public class RoomDetailFragment extends Fragment implements LoaderManager.Loader
 		// TODO Auto-generated method stub
 		
 	}
+	
+    public void showSettingsDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new SettingsDialog();
+        dialog.setTargetFragment(this, DIALOG_CODE);
+        
+        Bundle args = new Bundle();
+        args.putString(SettingsDialog.ROOM_ID, getArguments().getString(ARG_ROOM_ID));
+        dialog.setArguments(args);
+
+        dialog.show(getFragmentManager(), "SettingsDialog");
+        
+    }
+    
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(requestCode) {
+            case DIALOG_CODE:
+
+                if (resultCode == Activity.RESULT_OK) {
+                    // After Ok code.
+                } else if (resultCode == Activity.RESULT_CANCELED){
+                    // After Cancel code.
+                }
+
+                break;
+        }
+    }
 }
+

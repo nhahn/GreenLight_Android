@@ -16,7 +16,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,7 +29,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
 
 public class RailsUtils {
 
@@ -153,7 +151,7 @@ public class RailsUtils {
         return convertStreamToString(response.getEntity().getContent());
 	}
 	
-	public static JSONArray postRequest(String root, String path, String json) throws ClientProtocolException, IOException
+	public static JSONObject postRequest(String root, String path, String json) throws ClientProtocolException, IOException
 	{
 		DefaultHttpClient client = new DefaultHttpClient();
 		Uri.Builder uri = Uri.parse("http://"+root).buildUpon().path(path);
@@ -165,21 +163,16 @@ public class RailsUtils {
         post.setHeader("Content-Type", "application/json");
         post.setEntity(new StringEntity(json));
         response = client.execute(post);
-        String out = convertStreamToString(response.getEntity().getContent());
-        try{
-        	return new JSONArray(out);
-        } catch (JSONException e)
-        {
-        	try{
-        		JSONArray ret = new JSONArray();
-        		ret.put(new JSONObject(out));
-        		return ret;
-        	} catch (Exception e1)
-        	{
-        		Log.e("JSONProblem", e1.getMessage(), e1);
-        		return new JSONArray();
-        	}
-        }
+        try {
+			return new JSONObject(convertStreamToString(response.getEntity().getContent()));
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+			return null;
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 	
 	public static String convertStreamToString(InputStream inputStream) throws IOException {

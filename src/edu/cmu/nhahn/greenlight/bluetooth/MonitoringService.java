@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -27,6 +28,7 @@ import edu.cmu.nhahn.greenlight.R;
 import edu.cmu.nhahn.greenlight.RoomDetailFragment;
 import edu.cmu.nhahn.greenlight.RoomListActivity;
 
+@SuppressLint("UseSparseArrays")
 public class MonitoringService extends Service implements IBeaconConsumer{
 	
     protected static final String TAG = "RangingActivity";

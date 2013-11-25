@@ -39,6 +39,7 @@ public class RoomDetailActivity extends Activity {
 			arguments.putString(RoomDetailFragment.ARG_ROOM_ID, getIntent()
 					.getStringExtra(RoomDetailFragment.ARG_ROOM_ID));
 			RoomDetailFragment fragment = new RoomDetailFragment();
+			fragment.setHasOptionsMenu(true);
 			fragment.setArguments(arguments);
 			getFragmentManager().beginTransaction()
 					.replace(R.id.room_detail_container, fragment).commit();

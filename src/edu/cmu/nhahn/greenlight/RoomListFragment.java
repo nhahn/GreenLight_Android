@@ -115,7 +115,8 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				((SimpleCursorAdapter) getListAdapter()).getFilter().filter(s);
+				if (!s.toString().isEmpty())
+					((SimpleCursorAdapter) getListAdapter()).getFilter().filter(s);
 			}
 			
 		});
@@ -220,7 +221,7 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, final Cursor c) {
-		String[] bindFrom = {"room_name"};
+		String[] bindFrom = {"official_name"};
 		int[] bindTo = {android.R.id.text1};
 		
 		if(c != null)
@@ -236,7 +237,7 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 					RailsCursor cursor = ((RailsCursor) ((CursorWrapper) c).getWrappedCursor());
 					Uri mDataUrl = Uri.parse("content://"+RailsProvider.AUTHORITY+"/Room/cache/"+cursor.getUID());
 					String[] item = {"%" + cs.toString() + "%"};
-					return getActivity().getContentResolver().query(mDataUrl, null, "room_name LIKE ?", item, null);
+					return getActivity().getContentResolver().query(mDataUrl, null, "official_name LIKE ?", item, null);
 				}
 				
 			});

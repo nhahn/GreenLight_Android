@@ -2,15 +2,26 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
-            android:title="General Settings" />
+            android:title="@string/login_settings_category" />
  
     <PreferenceScreen
-        android:key="account_settings"
-        android:title="Account Settings"
-        android:summary="Password Change, Notifications">
+        android:key="login_settings"
+        android:title="@string/login_settings"
+        android:summary="@string/login_settings_summary">
         <intent
             android:action="edu.cmu.nhahn.greenlight.authentication.Preferences.ACCOUNT_SETUP"
             android:targetPackage="edu.cmu.nhahn.greenlight"
             android:targetClass="edu.cmu.nhahn.greenlight.authentication.Preferences" />
     </PreferenceScreen>
+     
+    <PreferenceCategory android:title="@string/pref_update_setting" >
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="prefLocateGreenlight"
+            android:summary="@string/pref_locator_summary"
+            android:title="@string/pref_locator" >
+        </CheckBoxPreference>
+    </PreferenceCategory>
+ 
 </PreferenceScreen>
+    

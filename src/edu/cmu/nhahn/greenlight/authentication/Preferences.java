@@ -1,8 +1,8 @@
 package edu.cmu.nhahn.greenlight.authentication;
 
-import android.app.Activity;
+import android.preference.PreferenceActivity;
 
-public class Preferences extends Activity {
+public class Preferences extends PreferenceActivity {
 
 	public Preferences() {
 		// TODO Auto-generated constructor stub

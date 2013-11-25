@@ -13,7 +13,6 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -42,9 +41,9 @@ public class AccountPicker extends ListActivity {
 		String[] accounts = getAccountNames();
 		if (accounts.length < 1)
 		{
-			Intent intent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-			intent.putExtra(Settings.EXTRA_AUTHORITIES, "edu.cmu.nhahn.greenlight");
-			this.startActivity(intent);
+			mAccountManager.addAccount(GreenlightAuthenticator.ACCOUNT_TYPE, 
+					LogonManager.PARAM_AUTHTOKEN_TYPE, 
+					null, null, this, new OnTokenAcquired(), null);
 		}
 		
 		ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,

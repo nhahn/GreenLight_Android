@@ -1,12 +1,12 @@
 package edu.cmu.nhahn.greenlight;
 
 import android.app.Activity;
+import android.app.ListFragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.CursorWrapper;
-import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
-import android.app.ListFragment;
 import android.widget.SimpleCursorAdapter;
 import edu.cmu.nhahn.greenlight.contentprovider.RailsCursor;
 import edu.cmu.nhahn.greenlight.contentprovider.RailsProvider;
@@ -126,7 +125,6 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-
 		// Restore the previously serialized activated item position.
 		if (savedInstanceState != null
 				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {

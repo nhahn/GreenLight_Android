@@ -143,6 +143,7 @@ public class RailsCursor extends AbstractCursor {
 				RailsAssociation aso = associations.get(key);
 				if (key.equals("id"))
 					ids[i] = obj.optInt(key); 
+				//TODO get cached through associations working
 				if( aso != null)
 					if (aso.isArray())
 						try {

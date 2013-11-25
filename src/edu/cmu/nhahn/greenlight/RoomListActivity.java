@@ -1,6 +1,7 @@
 package edu.cmu.nhahn.greenlight;
 
 import edu.cmu.nhahn.greenlight.R;
+import edu.cmu.nhahn.greenlight.bluetooth.MonitoringService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.Activity;
@@ -34,6 +35,8 @@ public class RoomListActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_room_list);
 
+		startService(new Intent(this,MonitoringService.class));
+		
 		if (findViewById(R.id.room_detail_container) != null) {
 			// The detail container view will be present only in the
 			// large-screen layouts (res/values-large and
@@ -45,6 +48,11 @@ public class RoomListActivity extends Activity implements
 			// 'activated' state when touched.
 			((RoomListFragment) getFragmentManager().findFragmentById(
 					R.id.room_list)).setActivateOnItemClick(true);
+		}
+		
+		if(getIntent().getStringExtra(RoomDetailFragment.ARG_ROOM_ID) != null)
+		{
+			onItemSelected(getIntent().getStringExtra(RoomDetailFragment.ARG_ROOM_ID));
 		}
 
 		// TODO: If exposing deep links into your app, handle intents here.

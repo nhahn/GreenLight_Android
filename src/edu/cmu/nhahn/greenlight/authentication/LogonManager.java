@@ -11,6 +11,7 @@ import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -100,6 +101,10 @@ public class LogonManager extends AccountAuthenticatorActivity {
         	accMgr.setAuthToken(account, PARAM_AUTHTOKEN_TYPE, authtoken);
         } else {
         	accMgr.setPassword(account, accountPassword);
+        }
+        
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+        	//TODO Disable the preference
         }
         setAccountAuthenticatorResult(intent.getExtras());
         setResult(RESULT_OK, intent);

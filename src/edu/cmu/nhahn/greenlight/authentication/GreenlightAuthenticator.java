@@ -140,6 +140,13 @@ public class GreenlightAuthenticator extends AbstractAccountAuthenticator {
 		return null;
 	}
 
+	@Override
+	public Bundle getAccountRemovalAllowed(AccountAuthenticatorResponse response, Account account) {
+	    Bundle result = new Bundle();
+	    boolean allowed = true; // or whatever logic you want here
+	    result.putBoolean(AccountManager.KEY_BOOLEAN_RESULT, allowed);
+	    return result;
+	}
 	
 
 }

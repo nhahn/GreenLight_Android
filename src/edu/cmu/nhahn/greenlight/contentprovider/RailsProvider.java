@@ -147,7 +147,7 @@ public class RailsProvider extends ContentProvider {
 			//Make cacheSearch more robust
 			RailsCacheEntry ent = database.cacheSearch(RailsCacheHelper.generateCacheUID(model, selection, selectionArgs));
 			if (ent != null)
-				return ent.performQuery(database);
+				return ent.performQuery(database);  
 		}
 		
 		String[] includes;
@@ -160,7 +160,7 @@ public class RailsProvider extends ContentProvider {
 			query = q.toString();
 		} catch (JSONException e) {
 			//Output some message here
-			Log.e("RailsProviderQuery", "Error parsing user query");
+			Log.e("RailsProviderQuery", "Error parsing user query", e);
 			return null;
 		}
 		
@@ -206,7 +206,7 @@ public class RailsProvider extends ContentProvider {
 
 		try {
 			switch(uriType) {
-			case SHOW:
+			case INDEX:
 				JSONObject params = new JSONObject();
 				obj.put("model", model);
 				Map<String,String> fieldMap = RailsUtils.buildFields(model, database.getReadableDatabase());
@@ -214,7 +214,7 @@ public class RailsProvider extends ContentProvider {
 				{
 					RailsUtils.jsonAdapt(fieldMap.get(key), params, key, values);
 				}
-				obj.put(model, params);
+				obj.put(model.toLowerCase(), params);
 				break;
 			}
 			
@@ -231,7 +231,7 @@ public class RailsProvider extends ContentProvider {
 			if(RailsException.validateError(response))
 				throw new IllegalArgumentException(new RailsException(response));
 		
-			return Uri.parse("content://" + AUTHORITY + "/" + model + "/" + response.getInt("id"));
+			return Uri.parse("content://" + AUTHORITY + "/" + model + "/" + response.getJSONObject("object").getInt("id"));
 		} catch (JSONException e)
 		{
 			//TODO error parsing JSON
@@ -246,8 +246,9 @@ public class RailsProvider extends ContentProvider {
 		JSONObject obj = new JSONObject();
 		String model = uri.getPathSegments().get(0);
 		JSONObject response = new JSONObject();
-
+		
 		try {
+			obj.put("id", uri.getLastPathSegment());
 			switch(uriType) {
 			case SHOW:
 				JSONObject params = new JSONObject();
@@ -255,12 +256,9 @@ public class RailsProvider extends ContentProvider {
 				Map<String,String> fieldMap = RailsUtils.buildFields(model, database.getReadableDatabase());
 				for(String key : values.keySet())
 				{
-					if (key.equals("id"))
-						obj.put("id", values.get(key));
-					else
-						RailsUtils.jsonAdapt(fieldMap.get(key), params, key, values);
+					RailsUtils.jsonAdapt(fieldMap.get(key), params, key, values);
 				}
-				obj.put(model, params);
+				obj.put(model.toLowerCase(), params);
 				break;
 			}
 			
@@ -271,7 +269,7 @@ public class RailsProvider extends ContentProvider {
 				throw new IllegalArgumentException(e);
 			} catch (IOException e) {
 				// TODO Error contacting server -- can't be saved
-				throw new IllegalStateException(e);
+				throw new IllegalStateException(e); 
 			}
 			//TODO handle this better
 			if(RailsException.validateError(response))

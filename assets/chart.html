@@ -5,6 +5,10 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript">
 
+      jQuery.ajaxSetup({
+          headers: {"X-Requested-With": "XMLHttpRequest"}
+      });
+
       // Load the Visualization API and the piechart package.
       google.load('visualization', '1.0', {'packages':['corechart']});
 
@@ -37,6 +41,7 @@
             processData: false,
             data: 'DATATOREPLACE',
             success: function (data) {
+              data = data.response;
               for (var i=0; i<data.length;i++)
               {
                 table.addRow([dp(data[i].recorded_at), data[i].value]);

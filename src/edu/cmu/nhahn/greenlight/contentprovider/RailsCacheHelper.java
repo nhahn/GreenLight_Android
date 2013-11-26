@@ -140,6 +140,12 @@ public class RailsCacheHelper extends SQLiteOpenHelper {
 			if(!scopeArr[0].equals("includes"))
 				scopes.put(scopeObj);
 		}
+		if(scopes.length() < 1)
+		{
+			JSONObject scopeObj = new JSONObject();
+		    scopeObj.put("scope", "all");
+		    scopes.put(scopeObj);
+		}
 		json.put("scopes",scopes);
 		return json;
 	}
@@ -173,11 +179,11 @@ public class RailsCacheHelper extends SQLiteOpenHelper {
 	public synchronized boolean updateCache(String root, String model)
 	{
 		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-		queryBuilder.setTables(RailsCacheTable.TABLE_URI);
-		String[] args = {model};
-		Cursor c = queryBuilder.query(getReadableDatabase(), null, "model = ?", args, null, null, null);
-		c.moveToFirst();
-		int lastUpdate = c.getInt(c.getColumnIndex(RailsCacheTable.COLUMN_UPDATE));
+		queryBuilder.setTables(model);
+		Cursor c = queryBuilder.query(getReadableDatabase(), null, null, null, null, null, "updated_at desc");
+		if(!c.moveToFirst())
+			return true;
+		int lastUpdate = c.getInt(c.getColumnIndex("updated_at"));
 		try {				
 			Map<String,String> map = new HashMap<String,String>();
 			map.put("model", model);
@@ -188,9 +194,6 @@ public class RailsCacheHelper extends SQLiteOpenHelper {
 			JSONObject updateResponse = new JSONObject(RailsUtils.getRequest(root,"api/v1/refresh.json",map));
 			if (lastUpdate != updateResponse.getInt("update"))
 			{
-				ContentValues cv = new ContentValues();
-				cv.put(RailsCacheTable.COLUMN_UPDATE, updateResponse.getInt("update"));
-				getWritableDatabase().update(RailsCacheTable.TABLE_URI, cv, "model = ?", args);
 				return true;
 			}
 			else

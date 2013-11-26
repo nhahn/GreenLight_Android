@@ -1,0 +1,11 @@
+== Greenlight Android Application ==
+
+This android application serves as part of my Greenlight IS project. It has the ability to view information contained within the webapp, as well
+as control the hardware dimmer device. Additionally, it has a bluetooth low energy ranging component that 
+
+= Libraries =
+
+The only library that is used is the AndroidIBeaconService Library by RadiusNetworks. 
+http://developer.radiusnetworks.com/ibeacon/android/
+
+It has a background service that scans for Bluetooth LE as managed by the MonitoringService class. 

@@ -10,6 +10,7 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -17,6 +18,7 @@ import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import edu.cmu.nhahn.greenlight.contentprovider.RailsCacheHelper;
 import edu.cmu.nhahn.greenlight.contentprovider.RailsCursor;
@@ -206,7 +209,14 @@ public class RoomDetailFragment extends Fragment implements LoaderManager.Loader
             case DIALOG_CODE:
 
                 if (resultCode == Activity.RESULT_OK) {
-                    // After Ok code.
+                    if (data.hasExtra(SettingsDialog.LEVEL_CHANGED))
+                    {
+                    	new UpdateTask().execute(SettingsDialog.LEVEL_CHANGED,""+data.getIntExtra(SettingsDialog.LEVEL_CHANGED_ID,0), ""+data.getIntExtra(SettingsDialog.LEVEL_CHANGED, 50));
+                    }
+                    if (data.hasExtra(SettingsDialog.SWITCH_CHANGED))
+                    {
+                    	new UpdateTask().execute(SettingsDialog.SWITCH_CHANGED,""+data.getIntExtra(SettingsDialog.SWITCH_CHANGED_ID,0), ""+data.getBooleanExtra(SettingsDialog.SWITCH_CHANGED, false));
+                    }
                 } else if (resultCode == Activity.RESULT_CANCELED){
                     // After Cancel code.
                 }
@@ -214,5 +224,37 @@ public class RoomDetailFragment extends Fragment implements LoaderManager.Loader
                 break;
         }
     }
+    
+	 private class UpdateTask extends AsyncTask<String, Void, Integer> {
+	     protected Integer doInBackground(String... id) {
+	    	if(id[0].equals(SettingsDialog.LEVEL_CHANGED))
+	    	{
+		 		Uri mDataUrl = Uri.parse("content://"+RailsProvider.AUTHORITY+"/DimmerSetting");	
+				
+		 		ContentValues cv = new ContentValues();
+		 		cv.put("room_dimmer_id", id[1]);
+		 		cv.put("value", id[2]);
+		 		
+		        return getActivity().getContentResolver().insert(mDataUrl, cv).hashCode();
+	    	} else
+	    	{
+		 		Uri mDataUrl = Uri.parse("content://"+RailsProvider.AUTHORITY+"/Dimmer/" + id[1]);
+		 		
+		 		ContentValues cv = new ContentValues();
+		 		cv.put("is_on", id[2]);
+		 		
+		        return getActivity().getContentResolver().update(mDataUrl, cv, "", null);
+	    	}
+
+	     }
+
+	     protected void onProgressUpdate(Void... progress) {
+	     }
+
+	     protected void onPostExecute(Integer c) {
+
+	     }
+	 }
+    
 }
 

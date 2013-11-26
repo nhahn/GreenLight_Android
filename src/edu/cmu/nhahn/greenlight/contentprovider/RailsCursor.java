@@ -37,7 +37,12 @@ public class RailsCursor extends AbstractCursor {
 			this.json = new JSONArray(jsonout.optString("response"));
 		} catch (JSONException e1) {
 			this.json = new JSONArray();
-			this.json.put(jsonout.optJSONObject("response"));
+			try {
+				this.json.put(new JSONObject(jsonout.optString("response")));
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		cache = false;

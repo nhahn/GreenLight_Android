@@ -6,7 +6,6 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.CursorWrapper;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,10 +14,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import edu.cmu.nhahn.greenlight.contentprovider.RailsCursor;
 import edu.cmu.nhahn.greenlight.contentprovider.RailsProvider;
 
 /**
@@ -115,8 +112,7 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before,
 					int count) {
-				if (!s.toString().isEmpty())
-					((SimpleCursorAdapter) getListAdapter()).getFilter().filter(s);
+				((RoomAdapter) getListAdapter()).getFilter().filter(s);
 			}
 			
 		});
@@ -162,7 +158,7 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		Cursor c = ((SimpleCursorAdapter) listView.getAdapter()).getCursor(); 
+		Cursor c = ((RoomAdapter) listView.getAdapter()).getCursor(); 
 		mCallbacks.onItemSelected(c.getString(c.getColumnIndex("id")));
 	}
 
@@ -201,7 +197,7 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 	public Loader<Cursor> onCreateLoader(int loaderID, Bundle arg1) {
 		
 		Uri mDataUrl = Uri.parse("content://"+RailsProvider.AUTHORITY+"/Room");
-		
+		String[] args = {"symbol:building"};
 		switch (loaderID) {
 		case URL_LOADER:
 			// Returns a new CursorLoader
@@ -209,8 +205,8 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 					getActivity(),   // Parent activity context
 					mDataUrl,        // Table to query
 					null,     // Projection to return
-					null,            // No selection clause
-					new String[0],            // No selection arguments
+					"includes(?)",            // No selection clause
+					args,            // No selection arguments
 					""             // Default sort order
 					);
 		default:
@@ -221,26 +217,11 @@ public class RoomListFragment extends ListFragment implements LoaderManager.Load
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, final Cursor c) {
-		String[] bindFrom = {"official_name"};
-		int[] bindTo = {android.R.id.text1};
 		
 		if(c != null)
 		{
-			SimpleCursorAdapter adapt = new SimpleCursorAdapter(getActivity().getApplicationContext(),
-					R.layout.list_item_custom,
-				c, bindFrom, bindTo, 0);
+			RoomAdapter adapt = new RoomAdapter(getActivity().getApplicationContext(),c);
 			setListAdapter(adapt);
-			adapt.setFilterQueryProvider(new FilterQueryProvider() {
-
-				@Override
-				public Cursor runQuery(CharSequence cs) {
-					RailsCursor cursor = ((RailsCursor) ((CursorWrapper) c).getWrappedCursor());
-					Uri mDataUrl = Uri.parse("content://"+RailsProvider.AUTHORITY+"/Room/cache/"+cursor.getUID());
-					String[] item = {"%" + cs.toString() + "%"};
-					return getActivity().getContentResolver().query(mDataUrl, null, "official_name LIKE ?", item, null);
-				}
-				
-			});
 			
 		}
 		
